@@ -1,0 +1,156 @@
+﻿@page "/hilo"
+
+<h3>Hi-Lo</h3>
+
+@if (!gameStart)
+{
+    <div class="d-flex flex-column w-25 gap-3 ">
+        <label class="form-label">Min Number</label>
+        <input type="number" placeholder="Min Number" @bind="minNum" />
+
+        <label class="form-label">Max Number</label>
+        <input type="number" placeholder="Max Number" @bind="maxNum" />
+
+        @if (minBiggerError)
+        {
+            <p class="alert-danger">Min number can't be bigger than Max number</p>
+        }
+        else if (numEqualError)
+        {
+            <p class="alert-danger">Min number and Max number can't be equal</p>
+        }
+        <button @onclick="StartGame">Start</button>
+    </div>
+}
+else
+{
+    <h3 class="mb-5">Guess the number between @minNum and @maxNum</h3>
+    <h5>Life : @life</h5>
+    <div class="d-flex flex-column w-25 gap-3">
+        <label class="form-label">Guess the random number</label>
+        <input class="" type="number" @bind="guessNum" />
+        @if (notBetweenError)
+        {
+            <p class="alert-danger">Guess number isn't between @minNum and @maxNum</p>
+        }
+        else if (life == 0)
+        {
+            randbigger = false;
+            randlesser = false;
+            <p class="alert-danger">You have no life : the number was @randNum</p>
+        }
+        else if (randbigger)
+        {
+            <p class="alert-info">Random number is bigger</p>
+        }
+        else if (randlesser)
+        {
+            <p class="alert-primary">Random number is lesser</p>
+        }
+        else if (numberGuessed)
+        {
+            <p class="alert-success">Congratulation you guessed the Number: the number was @randNum</p>
+        }
+
+        @if (numberGuessed)
+        {
+            <div>
+                <button @onclick="StartGame">Play Again</button>
+                <button @onclick="ResetGame">Change Number</button>
+            </div>
+
+        }
+        else if (life == 0)
+        {
+            <div>
+                <button @onclick="StartGame">Play Again</button>
+                <button @onclick="ResetGame">Change Number</button>
+            </div>
+        }
+        else
+        {
+            <button @onclick="GuessNum">Guess</button>
+        }
+    </div>
+}
+
+@code {
+    private bool gameStart { get; set; } = false;
+    private int minNum;
+    private int maxNum;
+    private int randNum;
+    private int guessNum;
+    private int life;
+
+    private bool randbigger;
+    private bool randlesser;
+    private bool numberGuessed;
+    
+
+    private bool minBiggerError;
+    private bool numEqualError;
+    private bool notBetweenError;
+
+
+    private void StartGame()
+    {
+        numberGuessed = false;
+        guessNum = 0;
+        life = 5;
+        if (minNum > maxNum)
+        {
+            minBiggerError = true;
+
+        }
+        else if (minNum == maxNum)
+        {
+            numEqualError = true;
+        }
+        else
+        {
+            gameStart = true;
+            Random rand = new();
+            randNum = rand.Next(minNum, maxNum + 1);
+        }
+
+
+    }
+
+    private void GuessNum()
+    {
+
+
+        if(minNum > guessNum || guessNum>maxNum)
+        {
+            notBetweenError = true;
+        }
+        else if(guessNum < randNum)
+        {
+            notBetweenError = false;
+            randlesser = false;
+            randbigger = true;
+            life--;
+        }
+        else if (guessNum > randNum)
+        {
+            notBetweenError = false;
+            randbigger = false;
+            randlesser = true;
+            life--;
+        }
+
+        else if (randNum == guessNum)
+        {
+            notBetweenError = false;
+            randlesser = false;
+            randbigger = false;
+            numberGuessed = true;
+        }
+    }
+
+    private void ResetGame()
+    {
+        gameStart = false;
+    }
+}
+  
